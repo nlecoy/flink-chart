@@ -1,0 +1,27 @@
+{{- if .Values.taskmanager.queryState.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flink.fullname" . }}-taskmanager-query-state
+  labels:
+    app: {{ include "flink.labels.app" . }}
+    component: taskmanager-query-state
+    chart: {{ include "flink.labels.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.queryState.selector }}
+    {{- toYaml .Values.queryState.selector | nindent 4 }}
+    {{- end }}
+spec:
+  type: NodePort
+  selector:
+    matchLabels:
+      app: {{ include "flink.labels.app" . }}
+      component: taskmanager-query-state
+      release: {{ .Release.Name }}
+  ports:
+    - name: query-state
+      port: 6125
+      targetPort: 6125
+      nodePort: 30025
+{{- end }}

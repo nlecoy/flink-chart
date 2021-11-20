@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flink.fullname" . }}-jobmanager
+  {{- if .Values.jobmanager.service.annotations }}
+  annotations:
+    {{- toYaml .Values.jobmanager.service.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ include "flink.labels.app" . }}
+    component: jobmanager
+    chart: {{ include "flink.labels.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: ClusterIP
+  selector:
+    app: {{ include "flink.labels.app" . }}
+    component: jobmanager
+    release: {{ .Release.Name }}
+  ports:
+  - name: rpc
+    port: 6123
+  - name: blob-server
+    port: 6124
+  - name: webui
+    port: 8081

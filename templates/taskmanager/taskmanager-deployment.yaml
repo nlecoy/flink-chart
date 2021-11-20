@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flink.fullname" .}}-taskmanager
+  {{- if .Values.taskmanager.annotations }}
+  annotations:
+    {{- toYaml .Values.taskmanager.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ include "flink.labels.app" . }}
+    component: taskmanager
+    chart: {{ include "flink.labels.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.taskmanager.labels }}
+    {{- toYaml .Values.taskmanager.labels | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.taskmanager.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "flink.labels.app" . }}
+      component: taskmanager
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "flink.labels.app" . }}
+        component: taskmanager
+        release: {{ .Release.Name }}
+        {{- if .Values.taskmanager.podLabels }}
+        {{- toYaml .Values.taskmanager.podLabels | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: Always
+      {{- if .Values.flink.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.flink.image.pullSecret }}
+      {{- end }}
+      containers:
+        - name: taskmanager
+          {{- include "flink.image" . | indent 10 }}
+          resources:
+            {{- toYaml .Values.taskmanager.resources | nindent 12 }}
+          args: ["taskmanager"]
+          ports:
+            - name: rpc
+              containerPort: 6122
+            - name: query-state
+              containerPort: 6125
+          {{- if .Values.taskmanager.livenessProbe.enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: 6122
+            initialDelaySeconds: {{ .Values.taskmanager.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.taskmanager.livenessProbe.periodSeconds }}
+          {{- end }}
+          securityContext:
+            runAsUser: {{ .Values.flink.image.uid }}
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf/
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: {{ include "flink.fullname" . }}-config
+            items:
+              - key: flink-conf.yaml
+                path: flink-conf.yaml
+              - key: log4j-console.properties
+                path: log4j-console.properties
