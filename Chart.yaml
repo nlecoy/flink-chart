@@ -1,0 +1,16 @@
+apiVersion: v2
+description: Helm chart to deploy Apache Flink on Kubernetes
+name: flink
+version: 0.1.0
+appVersion: 1.13.2
+icon: https://flink.apache.org/img/flink-header-logo.svg
+home: https://github.com/nlecoy/flink-chart
+maintainers:
+  - name: nlecoy
+    url: https://github.com/nlecoy
+sources:
+  - https://github.com/nlecoy/flink-chart
+keywords:
+  - flink
+  - data
+  - stream
