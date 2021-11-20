@@ -1,5 +1,7 @@
 # Apache Flink Helm Chart
 
+⚠️ This is a work in progress and should not be used in production ⚠️
+
 This chart will bootstrap an Apache Flink deployment on a Kubernetes cluster using the Helm package manager.
 
 ## Quickstart
