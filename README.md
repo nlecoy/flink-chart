@@ -55,3 +55,7 @@ $ helm upgrade \
 ```sh
 $ helm uninstall $FLINK_NAME --namespace $FLINK_NAMESPACE
 ```
+
+## License
+
+Distributed under the Apache 2.0 License. See [LICENSE](LICENSE) for more information.

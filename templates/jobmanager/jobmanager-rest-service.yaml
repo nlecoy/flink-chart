@@ -1,0 +1,29 @@
+{{- if .Values.jobmanager.rest.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "flink.fullname" . }}-jobmanager-rest
+  {{- if .Values.jobmanager.rest.annotations }}
+  annotations:
+    {{- toYaml .Values.jobmanager.rest.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ include "flink.labels.app" . }}
+    component: jobmanager
+    chart: {{ include "flink.labels.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.jobmanager.rest.type }}
+  selector:
+    app: {{ include "flink.labels.app" . }}
+    component: jobmanager
+    release: {{ .Release.Name }}
+  ports:
+    - name: rest
+      port: {{ .Values.jobmanager.rest.externalPort | default 8081}}
+      {{- if and (eq .Values.jobmanager.rest.type "NodePort") (.Values.jobmanager.rest.nodePort.http) }}
+      nodePort: {{ .Values.jobmanager.rest.nodePort.http }}
+      {{- end }}
+      targetPort: 8081
+{{- end }}
