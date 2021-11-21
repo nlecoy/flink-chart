@@ -1,0 +1,79 @@
+{{- if eq .Values.flink.mode "application" }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "flink.fullname" . }}-jobmanager
+  {{- if .Values.jobmanager.annotations }}
+  annotations:
+    {{- toYaml .Values.jobmanager.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: {{ include "flink.labels.app" . }}
+    component: jobmanager
+    chart: {{ include "flink.labels.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.jobmanager.labels }}
+    {{- toYaml .Values.jobmanager.labels | nindent 4 }}
+    {{- end }}
+spec:
+  parallelism: {{ .Values.jobmanager.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "flink.labels.app" . }}
+      component: jobmanager
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ include "flink.labels.app" . }}
+        component: jobmanager
+        release: {{ .Release.Name }}
+        {{- if .Values.jobmanager.podLabels }}
+        {{- toYaml .Values.jobmanager.podLabels | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: Always
+      {{- if .Values.flink.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.flink.image.pullSecret }}
+      {{- end }}
+      containers:
+        - name: jobmanager
+          {{- include "flink.image" . | indent 10 }}
+          resources:
+            {{- toYaml .Values.jobmanager.resources | nindent 12 }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+          args: ["standalone-job", "--host", "$(POD_IP)"]
+          ports:
+            - containerPort: 6123
+              name: rpc
+            - containerPort: 6124
+              name: blob-server
+            - containerPort: 8081
+              name: webui
+          {{- if .Values.jobmanager.livenessProbe.enabled }}
+          livenessProbe:
+            tcpSocket:
+              port: 6123
+            initialDelaySeconds: {{ .Values.jobmanager.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.jobmanager.livenessProbe.periodSeconds }}
+          {{- end }}
+          securityContext:
+            runAsUser: {{ .Values.flink.image.uid }}
+      serviceAccountName: {{ include "flink.serviceAccountName" .}}
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: {{ include "flink.fullname" . }}-config
+            items:
+              - key: flink-conf.yaml
+                path: flink-conf.yaml
+              - key: log4j-console.properties
+                path: log4j-console.properties
+{{- end }}
