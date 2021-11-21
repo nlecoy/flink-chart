@@ -32,7 +32,6 @@ spec:
         {{- toYaml .Values.taskmanager.podLabels | nindent 8 }}
         {{- end }}
     spec:
-      restartPolicy: Never
       {{- if .Values.flink.image.pullSecret }}
       imagePullSecrets:
         - name: {{ .Values.flink.image.pullSecret }}
