@@ -36,7 +36,7 @@ Construct the name of the Flink ServiceAccount.
 */}}
 {{- define "flink.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create -}}
-{{- .Values.serviceAccount.name | default (include "airflow.fullname" .) -}}
+{{- .Values.serviceAccount.name | default (include "flink.fullname" .) -}}
 {{- else -}}
 {{- .Values.serviceAccount.name | default "default" -}}
 {{- end -}}
