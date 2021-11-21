@@ -30,3 +30,14 @@ securityContext:
   runAsUser: {{ .Values.flink.image.uid }}
   runAsGroup: {{ .Values.flink.image.gid }}
 {{- end }}
+
+{{/*
+Construct the name of the Flink ServiceAccount.
+*/}}
+{{- define "flink.serviceAccountName" -}}
+{{- if .Values.serviceAccount.create -}}
+{{- .Values.serviceAccount.name | default (include "airflow.fullname" .) -}}
+{{- else -}}
+{{- .Values.serviceAccount.name | default "default" -}}
+{{- end -}}
+{{- end -}}

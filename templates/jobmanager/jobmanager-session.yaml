@@ -69,6 +69,7 @@ spec:
           volumeMounts:
             - name: flink-config-volume
               mountPath: /opt/flink/conf/
+      serviceAccountName: {{ include "flink.serviceAccountName" .}}
       volumes:
         - name: flink-config-volume
           configMap:

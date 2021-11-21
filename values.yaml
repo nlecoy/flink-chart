@@ -1,6 +1,6 @@
-###################################
+########################################
 ## CONFIG | Flink Configs
-###################################
+########################################
 
 flink:
 
@@ -30,9 +30,38 @@ flink:
   ##
   mode: session
 
-###################################
+########################################
+## CONFIG | Kubernetes RBAC
+########################################
+rbac:
+  ## If Kubernetes RBAC resources are created
+  ## These allow the service account to create/delete/update ConfigMaps in the Flink namespace,
+  ## which is required by the JobManager and TaskManager
+  ##
+  create: true
+
+########################################
+## CONFIG | Kubernetes ServiceAccount
+########################################
+
+serviceAccount:
+  ## If a Kubernetes ServiceAccount is created
+  ## If `false`, you must create the service account outside this chart with name: `serviceAccount.name`
+  ##
+  create: true
+
+  ## The name of the ServiceAccount
+  ## By default the name is generated using the `flink.serviceAccountName` template in `_helpers.tpl`
+  ##
+  name: ""
+
+  ## Annotations for the ServiceAccount
+  ##
+  annotations: {}
+
+########################################
 ## COMPONENT | Flink JobManager
-###################################
+########################################
 
 jobmanager:
   ## The number of JobManager Pods to run (Define this >1 for high availabilty)
@@ -75,9 +104,9 @@ jobmanager:
     nodePort:
       http: ""
 
-###################################
+########################################
 ## COMPONENT | Flink TaskManager
-###################################
+########################################
 
 taskmanager:
   ## The number of TaskManager Pods to run
