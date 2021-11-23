@@ -50,6 +50,10 @@ spec:
                   apiVersion: v1
                   fieldPath: status.podIP
           args: ["standalone-job", "--host", "$(POD_IP)"]
+          lifecycle:
+            preStop:
+              exec:
+                command: ["flink", "stop", "00000000000000000000000000000000"]
           ports:
             - containerPort: 6123
               name: rpc
