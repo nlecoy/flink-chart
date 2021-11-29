@@ -1,0 +1,21 @@
+{{- if (.Values.taskmanager.autoscaling.enabled) }}
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "flink.fullname" }}-taskmanger-hpa
+  labels:
+    app: {{ include "flink.labels.app" . }}
+    component: taskmanager
+    chart: {{ include "flink.labels.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "flink.fullname" .}}-taskmanager
+  minReplicas: {{ .Values.taskmanager.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.taskmanager.autoscaling.maxReplicas }}
+  metrics:
+    {{- toYaml .Values.taskmanager.autoscaling.metrics | nindent 4 }}
+{{- end }}

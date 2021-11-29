@@ -18,7 +18,7 @@ data:
     jobmanager.memory.process.size: 1600m
     taskmanager.memory.process.size: 1728m
     execution.checkpointing.interval: {{ .Values.flink.checkpointInterval }}
-    {{- if .Values.flink.reactive.enabled }}
+    {{- if .Values.taskmanager.autoscaling.enabled }}
     scheduler-mode: reactive
     {{- end }}
   log4j-console.properties: |+
